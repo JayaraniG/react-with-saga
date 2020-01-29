@@ -1,0 +1,45 @@
+﻿/* 
+
+html {
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+
+
+ .img {
+    width: 18px;
+    max-width: 18px;
+    height: 18px;
+    position: initial;
+}
+
+.signup {
+    display: flex !important;
+}
+.justify {
+    justify-content:space-between;
+}
+.line {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #000;
+    line-height: 0.1em;
+    margin: 10px 0 20px;
+}
+
+    .or {
+        background: #fff;
+       
+    }
+
+.login-page {
+    width: 390px;
+    padding: 8% 0 0;
+    margin: auto;
+}
+ */
