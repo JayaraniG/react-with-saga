@@ -1,23 +1,122 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import {GETALL_REQUEST} from '../actions/LoginActions'
+import {getAllRequest} from '../actions/LoginActions'
+import FullscreenModal from '../UserDelete/FullScreenModal';
+import UserDelete from '../UserDelete/userDelete'
+import {userActions} from '../actions/LoginActions';
 
-const Home = props => (
-  <div>
-    <h1>Hello, world!</h1>
-    <p>Welcome to your new single-page application, built with:</p>
-    <ul>
-      <li><a href='https://get.asp.net/'>ASP.NET Core</a> and <a href='https://msdn.microsoft.com/en-us/library/67ef8sbd.aspx'>C#</a> for cross-platform server-side code</li>
-      <li><a href='https://facebook.github.io/react/'>React</a> and <a href='https://redux.js.org/'>Redux</a> for client-side code</li>
-      <li><a href='http://getbootstrap.com/'>Bootstrap</a> for layout and styling</li>
-    </ul>
-    <p>To help you get started, we've also set up:</p>
-    <ul>
-      <li><strong>Client-side navigation</strong>. For example, click <em>Counter</em> then <em>Back</em> to return here.</li>
-      <li><strong>Development server integration</strong>. In development mode, the development server from <code>create-react-app</code> runs in the background automatically, so your client-side resources are dynamically built on demand and the page refreshes when you modify any file.</li>
-      <li><strong>Efficient production builds</strong>. In production mode, development-time features are disabled, and your <code>dotnet publish</code> configuration produces minified, efficiently bundled JavaScript files.</li>
-    </ul>
-    <p>The <code>ClientApp</code> subdirectory is a standard React application based on the <code>create-react-app</code> template. If you open a command prompt in that directory, you can run <code>npm</code> commands such as <code>npm test</code> or <code>npm install</code>.</p>
-  </div>
-);
+class Home extends React.Component {
+    constructor() {
+        super();
+        
+        this.state = { shouldDeleteUser: false };
+        this.deleteConfirmation = this.deleteConfirmation.bind(this);
+        this.dismissModal = this.dismissModal.bind(this);
+       this.handleDeleteUser = this.handleDeleteUser.bind(this);
+    }
+    componentDidMount() {
+        const {dispatch}=this.props;
+       dispatch(getAllRequest());
+        // console.log(e);
+        
+    }
 
-export default connect()(Home);
+
+    deleteConfirmation(userId) {
+        this.setState({ shouldDeleteUser: true,userId:userId});
+    }
+
+    dismissModal() {
+        this.setState({ shouldDeleteUser: false,userId:null });
+    }
+
+   handleDeleteUser(userId) {
+    const {dispatch}=this.props;
+     dispatch(userActions.delete(userId));
+       this.dismissModal();
+       
+   }
+
+ logout()
+{
+localStorage.removeItem("user");
+localStorage.removeItem("token")
+}
+
+ renderform() {
+      
+        const user = this.props.user;
+        const users=this.props.users?this.props.users:[];
+
+        return (
+            <div className="col-md-6 col-md-offset-3">
+                <h1>Hi {user.firstName}!</h1>
+                <p>You're logged In !!</p>
+                <h3>All registered users:</h3>
+                {user.loading && <em>Loading users...</em>}
+                {user.error && <span className="text-danger">ERROR: {user.error}</span>}
+                
+                   
+                    <table className='table'>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>UserId</th>
+                           <th>FirstName</th>
+                            <th>LastName</th>
+                            <th>UserName</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {users.map((user, index) =>
+                            <tr key={user.id}>
+                                <td></td>
+                                <td>{user.userId}</td>
+                                <td>{user.firstName}</td>
+                                <td>{user.lastName}</td>
+                                <td>{user.username}</td>
+                                <tr><td><a className="action" onClick={(id) => this.handleEditUser(user.id)}>Edit</a>|
+     
+                                <a onClick={(e) => { e.preventDefault(); this.deleteConfirmation(user.userId); }}>Delete</a></td>
+                                </tr>
+                            </tr>
+                        )}
+                    </tbody>
+                    </table>
+                <p>
+                <Link to="/" onClick={this.logout}>logout</Link>
+                </p>
+            </div>
+        );
+     }
+  
+     render() {
+        return (
+            <div>
+                <table>
+                    <tbody>
+                        {this.renderform()}
+                    </tbody>
+                </table>
+                <FullscreenModal shouldDisplay={this.state.shouldDeleteUser}>
+                    <UserDelete userId={this.state.userId} dismissModal={this.dismissModal} handleDeleteUser={this.handleDeleteUser} />
+                </FullscreenModal>
+            </div>
+        )
+    }
+}
+ 
+function mapStateToProps(state) {
+    const user=state.LoginReducer.user
+     const users=state.usersReducer.users
+    return {
+        user,
+       users
+       
+    };
+}
+ 
+const connectedHome = connect(mapStateToProps)(Home);
+export  {connectedHome as Home};

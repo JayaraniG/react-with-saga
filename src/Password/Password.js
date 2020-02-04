@@ -16,6 +16,7 @@ class Password extends React.Component {
            // user:{
             email: '',
             submitted: false,
+            status:false
            // }
         };
         this.handleChange = this.handleChange.bind(this);
@@ -41,6 +42,7 @@ class Password extends React.Component {
     }
   
     render() {
+        console.log("tst", localStorage.getItem('token'))
         const { email} = this.state;
         const{errors} = this.state;
        
@@ -64,7 +66,7 @@ class Password extends React.Component {
                         <input type="email" name="email" value={email} placeholder="Enter Email" onChange={this.handleChange} />
                         
                         <button type="submit">Reset Password</button>
-                       
+                         
                     </form>
                 </div>
             </div>
@@ -74,4 +76,4 @@ class Password extends React.Component {
 
 }
 
-export default connect()(Password);
+export default Password;

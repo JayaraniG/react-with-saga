@@ -146,12 +146,13 @@ body {
 }
 
 .signup {
-   
+    padding-right: 20px;
     float:right;
 }
 
 .logo {
     float: left;
+    padding-left: 20px;
 }
 header {
     padding-top: 49px;

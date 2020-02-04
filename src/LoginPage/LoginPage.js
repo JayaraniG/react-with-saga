@@ -1,82 +1,93 @@
 ﻿import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link,withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import {LOGIN_REQUEST} from '../actions/LoginActions';
+import {LOGIN_REQUEST, LOGOUT_RESET,userActions} from '../actions/LoginActions';
 import aroopa from '../aroopa.jpg';
 import '../LoginPage/login.css';
 import {inputvalidation} from '../Validation';
 import {history} from '../history'
+import {loginRequest} from '../actions/LoginActions';
+
+
 
 class LoginPage extends Component {
     constructor(props) {
         super(props);
 
-     
+        
     
         this.state = {
-            user:{
-            email: '',
-            password: ''
-            },
+        
+            username: '',
+            password: '',
+            status:false,
             checked: false,
             submitted: false,
             errors:{},
             passwordvalidation:{}
-           // }
+           
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    handleChange(event) {
-        const { name, value } = event.target;
-       const { user } = this.state;
-     
-        this.setState({
-            user: 
-            {
-                ...user,
-                [name]: value
-           }
-         });
-        
-    }
 
-    // handleChange(e) {
-    //     const { name, value } = e.target;
-    //     this.setState({ [name]: value });
-    // }
+
+    handleChange(e) {
+        const { name, value } = e.target;
+        this.setState({ [name]: value });
+    }
 
     handleSubmit(e) {
         e.preventDefault();
 
         this.setState({ submitted: true});
-        const{user}=this.state;
-        const { email, password } = this.state;
+      
+        const { username, password } = this.state;
         const { dispatch } = this.props;
        
-        const passwordvalidation=inputvalidation(user.password,"password")
-        const emailvalidation=inputvalidation(user.email,"email");
-        this.setState({
-            errors:emailvalidation,
-            passwordvalidation:passwordvalidation
-          
-        })
-        if (emailvalidation.value&&passwordvalidation.value==true) {
-          
-            dispatch({ type:LOGIN_REQUEST, email, password });
-            history.push('/Password');
+        if (username && password) {
+            dispatch(loginRequest(username, password));
+           
         }
     }
+// componentDidUpdate(prevProps)
+// {
+//     const token=localStorage.getItem("token");
+//     console.log(token);
+//     if(token)
+//     {
+//         this.props.history.push('/home'); 
+//     }
+// // if(prevProps.loginData!==this.props.loginData)
+// // {
+// //     console.log("test",this.props.loginData)
+// //     //localStorage.setItem('token', user.token);
+// //    this.props.history.push('/home');
+// //    const {dispatch}=this.props;
+// //     dispatch(userActions.logoutReset());
+// //     //this.setState({status:true})
+// // }
+// }
+
+
     handleCheckClick = () => {
         this.setState({ checked: !this.state.checked });
       }
 
     render() {
       // const login=this.props;
-        //console.log(login);
+      //localStorage.removeItem("token");
+      const token=localStorage.getItem("token");
+    console.log(token);
+    if(token)
+    {
+        this.props.history.push('/home'); 
+    }
+        console.log("guiygyui",this.props.loginData);
+
         const{user}=this.state;
-        const { email,password} = this.state;
+        const { username,password} = this.state;
         const{errors} = this.state;
         const{passwordvalidation}=this.state;
         return (
@@ -97,13 +108,10 @@ class LoginPage extends Component {
                       <div className="form">
                     <div className="h">Log In</div>
                         <form className="form-group" onSubmit={this.handleSubmit}>
-                        <input type="email" name="email" value={user.email} placeholder="Enter Email" onChange={this.handleChange} />
-                        {!errors.value ?
-                        (<label className="emailred">{errors.message}</label>) : (<label>{errors.message}</label>)}
-                        <input type="password"  name="password" value={user.password} placeholder="Enter Password" onChange={this.handleChange}  />
-                        {!passwordvalidation.value ?
-                        (<label className="pwdred">{passwordvalidation.message}</label>) : (<label>{passwordvalidation.message}</label>)}
-                
+                        <input type="text" name="username" value={username} placeholder="Enter Email" onChange={this.handleChange} />
+                         <input type="password"  name="password" value={password} placeholder="Enter Password" onChange={this.handleChange}  />
+                     
+                                     
                         <div>
                             <span>
                                 <input className="checkbox_aro" type="checkbox" name="checkbox"  checked={this.state.checked} onChange={this.handleCheckClick}/>
@@ -112,7 +120,7 @@ class LoginPage extends Component {
                           <Link to="/Password" className="fp">Forgot Password?</Link>
                         </div>
                         <button type="submit">Log In</button>
-                      
+                         
                         
                     </form>
                 </div>
@@ -122,14 +130,15 @@ class LoginPage extends Component {
     }
 
 }
-// function mapStateToProps(state) {
-//     const  login  = state;
-//       return {
-//       login
-//     };
-// }
- 
-// const connectedLoginPage = connect(mapStateToProps)(LoginPage);
-// export { connectedLoginPage as LoginPage };
+export const mapStateToProps = state => 
+({  
 
-export default connect()(LoginPage);
+ loginData: state.LoginReducer.data,
+ //user:state.LoginReducer.user
+});
+ 
+const connectedLoginPage = withRouter (connect(mapStateToProps)(LoginPage));
+export { connectedLoginPage as LoginPage };
+
+// export default connect()(LoginPage);
+
